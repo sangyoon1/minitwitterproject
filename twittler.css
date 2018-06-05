@@ -1,0 +1,150 @@
+.pic {
+    width: auto; height: auto;
+    max-width: 40px;
+    max-height: 40px;
+}
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-spacing: 0;
+}
+
+/* Custom */
+body {
+  font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #222;
+}
+
+a {
+  color: rgb(0, 132, 180);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  color: rgba(0, 132, 180, 0.5);
+}
+
+strong, .user {
+  font-weight: 700;
+}
+
+header {
+  padding: 1em;
+  position: relative;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+input, textarea, button {
+  display: inline-block;
+  padding: 0.5em 1em;
+  border: 1px solid rgba(0, 132, 180, 0.5);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+}
+
+.box {
+  color: #fff;
+  cursor: pointer;
+  background: rgb(0, 121, 165);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+button:hover {
+  opacity: 0.5;
+}
+
+.alerts {
+  position: relative;
+}
+
+.tweet {
+  opacity: 0;
+  padding: 1em;
+  display: block;
+  border-top: 1px dotted rgba(0, 132, 180, 0.5);
+}
+
+.color {
+  background: rgb(200, 200, 200);
+}
+
+
+.smalltext {
+  font-size: 0.7em;
+}
+
+.message {
+  font-weight: 200;
+  font-size: 1.4em;
+}
+
+.close-btn {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 1em;
+  top: 2em;
+}
+
+#tweet-writer {
+  display: none;
+  position: relative;
+  padding: 2em;
+  background: rgb(225, 219, 255);
+  border-top: 1px dotted rgb(174, 158, 255);
+}
+
+
+#more-tweets {
+  cursor: pointer;
+  font-size: 0.8em;
+  padding: 0.5em 1em;
+  background: #ffffcc;
+  border-top: 1px solid rgb(255, 240, 158);
+}
+
+#clear-filter {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0.5em;
+  font-size: 0.7em;
+}

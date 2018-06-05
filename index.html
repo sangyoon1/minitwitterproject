@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf8">
+    <link href="twittler.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body>
+    <header>
+      <h1> <img src="codestates.png" class="pic">Twittler</h1>
+      <button class="box tweet-writer-control">트윗 쓰기</button>
+    </header>
+    <section id="tweet-writer">
+      <h2>트윗 쓰기</h2>
+      <div class="row">
+        <label for="UserName">유져이름</label>
+        <input type="text" id="UserName" name="UserName"></input>
+      </div>
+
+      <div class="row">
+        <label for="message">메세지</label>
+        <textarea id="message" name="message"></textarea>
+      </div>
+      <button id="send-tweet" class="box">전송</button>
+    </section>
+    <section class="alerts">
+      <div id="more-tweets">새로운 트윗</div>
+      <button id="clear-filter" class="box">돌아가기</button>
+    </section>
+    <section id="tweet-container">
+    </section>
+    <script src="jquery.js"></script>
+    <script src="data_generator.js"></script>
+    <script src="jquery.timeago.js"></script>
+    <script type="text/javascript">
+      window.visitor;
+
+      $(document).ready(function(){
+
+        var tweetEvents = (function() {
+          // 갯수
+          function counter() {
+            return streams.home.length;
+          }
+
+          // 화면에 보여지고 있는 트윗
+          function DisplayedTweets() {
+            return $('.tweet');
+          }
+
+          function colorRows(tweets) {
+            // 트윗리스트가 없을경우
+            if (typeof tweets === 'undefined') {
+              var tweets = this.DisplayedTweets();
+            }
+            // 색상더하기
+            for (var j = 0; j < tweets.length; j++) {
+              if (j % 2 === 0) {
+                tweets.eq(j).addClass('color');
+              } else {
+                tweets.eq(j).removeClass('color');
+              }
+            }
+          }
+
+          // 각각 트윗
+          function displayIndividualTweet(number) {
+            var tweet = streams.home[number];
+            var $tweet = $('<div class="tweet"><p class="date smalltext">' +
+            $.timeago(tweet.created_at) + '</p><p class="message">' + tweet.message +
+            '</p><p class="posted-by">&mdash; <a class="user">@' +
+            tweet.user + '</a></div>');
+
+            $tweet.prependTo($tweetContainer);
+            //밝기
+            $tweet.animate({'opacity': '1'}, 'slow');
+          }
+
+          // 새로운 트윗들
+          function displayNewTweets() {
+            for (var i = originalTweetCount; i < newTweetCount; i++) {
+              displayIndividualTweet(i);
+            }
+            // 갯수 동일화
+            originalTweetCount = newTweetCount;
+            // 붙이기
+            this.updateUserList($('.user'));
+            this.colorRows();
+            // 기다릴때
+            $moreTweets.html('..............기다리는중..............');
+          }
+
+          // 새로운 트윗
+          function checkForTweets() {
+            newTweetCount = counter();
+            if (newTweetCount > originalTweetCount) {
+              $moreTweets
+                .html((newTweetCount - originalTweetCount) +
+                '개의 새로운 트윗이 있습니다. 보려면 클릭하세요');
+            }
+
+            // 2초마다
+            setTimeout(function() {
+              checkForTweets();
+            }, 2000);
+          };
+
+          // 유져마다 분리
+          function filterByUser(user) {
+            var tweets = this.DisplayedTweets();
+            for (var j = 0; j < tweets.length; j++) {
+              var currentUser = tweets.eq(j).find('.user').text().trim();
+              // 똑같으면 add
+              if (currentUser === user) {
+                tweets.eq(j).addClass('filtered');
+              // 안똑같으면 remove 후 숨기기
+              } else {
+                tweets.eq(j).removeClass('filtered').slideUp();
+              }
+            }
+
+            // 돌아가기
+            $clearFilter.css('display', 'block');
+            // 다시 색깔 입히기
+            this.colorRows($('.filtered'));
+          };
+
+          // 유져각각
+          function updateUserList(users) {
+            users.click(function() {
+              var user = $(this).text().trim();
+              tweetEvents.filterByUser(user);
+            });
+          };
+
+          // 돌아가기 없애기
+          function clearFilter() {
+            $('.tweet').css('display', 'block');
+            $clearFilter.css('display', 'none');
+            this.colorRows();
+          }
+
+          // 리턴
+          return {
+            counter: counter,
+            DisplayedTweets: DisplayedTweets,
+            colorRows: colorRows,
+            displayIndividualTweet: displayIndividualTweet,
+            displayNewTweets: displayNewTweets,
+            checkForTweets: checkForTweets,
+            filterByUser: filterByUser,
+            updateUserList: updateUserList,
+            clearFilter: clearFilter
+          };
+        })();
+
+        // 저장
+        var $tweetContainer = $('#tweet-container');
+        var $moreTweets = $('#more-tweets');
+        var $clearFilter = $('#clear-filter');
+        var $tweetWriter = $('#tweet-writer');
+
+        // 초기화
+        var newTweetCount = 0;
+        var originalTweetCount = tweetEvents.counter();
+
+        // read 초기화
+        var read = {};
+
+        // 처음에서 시작
+        var index = streams.home.length - 1;
+
+        // 처음 11개
+        while (index >= 0) {
+          var newTweet = tweetEvents.displayIndividualTweet(index);
+          // 읽음표시
+          read[index] = true;
+          // 감소
+          index -= 1;
+        }
+
+        // 새트윗 외
+        tweetEvents.checkForTweets();
+        tweetEvents.updateUserList($('.user'));
+        tweetEvents.colorRows();
+
+        // 클릭시 새 트윗 보여주기
+        $moreTweets.click(function() {
+          tweetEvents.displayNewTweets();
+          tweetEvents.clearFilter();
+        });
+
+        // 클릭시 돌아가기
+        $clearFilter.click(function() {
+          tweetEvents.clearFilter();
+        });
+
+        // 쓰기박스 다른값전환
+        $('.tweet-writer-control').click(function() {
+          if ($tweetWriter.css('display') === 'block') {
+            $tweetWriter.slideUp();
+          } else {
+            $tweetWriter.slideDown();
+          }
+        });
+
+        // 전송 클릭시
+        $('#send-tweet').click(function() {
+          visitor = $('#UserName').val();
+          var message = $('#message').val();
+          // 비엇을시
+          if (visitor.length && message.length) {
+            // 애드
+            streams.users[visitor] = [];
+            // 전송
+            writeTweet(message);
+            // 저장
+            $tweetWriter.append('<p class="smalltext">저장완료</p>');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
